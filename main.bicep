@@ -15,6 +15,14 @@ param environmentName string = 'dev'
 
 param projectName string = 'playspot'
 
+//Variable -- calulated values used throughout the file
+//storageAccountName combies our parameters into one name
+var storageAccountName = '${projectName}storage${environmentName}001'
+
+//keyVaultName follows Azure naming convertion with hyphens
+var keyVaultName = '${projectName}-kv-${environmentName}'
+
+
 // resource keyword tells Bicep we are creating something
 // storageAccount is the name WE give this resource in Bicep
 // 'Microsoft.Storage/storageAccounts@2023-01-01' tells Azure
@@ -23,7 +31,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   
   // name of the actual storage account in Azure
   // we combine projectName and environmentName to make it unique
-  name: '${projectName}storage${environmentName}001'
+  name: storageAccountName
   
   // where to create it - uses our location parameter
   location: location
@@ -53,3 +61,10 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     Owner: 'Oscar'
   }
 }
+
+//Outputs - values returned after deployment completes
+//This returns the storage account name so other scripts can use it 
+output storageAccountName string = storageAccount.name
+
+//this returns the storage account endpoint URL
+output storageAccountEndpoint string = storageAccount.properties.primaryEndpoints.blob
