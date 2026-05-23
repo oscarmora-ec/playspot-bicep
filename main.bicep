@@ -19,6 +19,9 @@ var tags = {
   Version: '1.0'
 }
 
+// Cosmos DB account name
+var cosmosAccountName = '${projectName}-db-${environmentName}'
+
 // Storage Account Module
 // calls our storage.bicep module and passes values in
 module storage './modules/storage.bicep' = {
@@ -49,9 +52,28 @@ module keyVault './modules/keyvault.bicep' = {
   }
 }
 
+// Cosmos DB Module
+// calls our cosmosdb.bicep module and passes values in
+module cosmos './modules/cosmosdb.bicep' = {
+
+  // name of this module deployment
+  name: 'cosmosDeployment'
+
+  // params passes values into the module
+  params: {
+    location: location
+    accountName: cosmosAccountName
+    tags: tags
+  }
+}
+
 // Outputs - read from module outputs
 // notice we use module name dot outputs dot output name
 output storageAccountName string = storage.outputs.storageAccountName
 output storageAccountEndpoint string = storage.outputs.storageAccountEndpoint
 output keyVaultUri string = keyVault.outputs.keyVaultUri
 output keyVaultResourceName string = keyVault.outputs.keyVaultResourceName
+
+// Cosmos DB outputs
+output cosmosAccountName string = cosmos.outputs.cosmosAccountName
+output cosmosEndpoint string = cosmos.outputs.cosmosEndpoint
