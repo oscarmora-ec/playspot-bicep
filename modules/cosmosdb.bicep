@@ -17,16 +17,10 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   // kind DocumentDB is the default NoSQL API
   kind: 'GlobalDocumentDB'
 
-  properties: {
-
-    // consistencyPolicy defines how data is replicated
-    // Session is the default and works well for most apps
+ properties: {
     consistencyPolicy: {
       defaultConsistencyLevel: 'Session'
     }
-
-    // locations defines where data is stored
-    // we use one location to minimize cost
     locations: [
       {
         locationName: location
@@ -34,20 +28,15 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
         isZoneRedundant: false
       }
     ]
-
-    // capabilities defines special features
-    // EnableServerless means pay per request not per hour
     capabilities: [
       {
         name: 'EnableServerless'
       }
     ]
-
-    // disableKeyBasedMetadataWriteAccess improves security
-    // prevents accidental changes via account keys
     disableKeyBasedMetadataWriteAccess: false
+    databaseAccountOfferType: 'Standard'
   }
-}
+  }
 
 // Cosmos DB Database resource
 // depends on the account above being created first
