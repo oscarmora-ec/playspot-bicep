@@ -81,3 +81,4 @@ output cosmosAccountName string = cosmos.outputs.cosmosAccountName
 output cosmosEndpoint string = cosmos.outputs.cosmosEndpoint
 
 // Updated to trigger GitHub Actions deployment
+// Infrastructure managed by GitHub Actions
