@@ -1,0 +1,60 @@
+# GitHub Actions Workflow
+# Automatically deploys Bicep infrastructure when code is pushed
+
+# name shows in GitHub Actions tab
+name: Deploy PlaySpot Infrastructure
+
+# on defines what triggers this workflow
+on:
+  push:
+    # only run when code is pushed to main branch
+    branches:
+      - master
+  # allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+# jobs are the actual work that gets done
+jobs:
+  deploy:
+    # runs-on defines what machine runs this workflow
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1 - checkout your code from GitHub
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2 - login to Azure using SP credentials
+      # secrets are read from GitHub Secrets we just added
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: |
+            {
+              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
+              "tenantId": "${{ secrets.AZURE_TENANT_ID }}",
+              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+            }
+
+      # Step 3 - deploy Bicep template to Azure
+      - name: Deploy Bicep Infrastructure
+        uses: azure/arm-deploy@v1
+        with:
+          # which subscription to deploy to
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          # which resource group to deploy to
+          resourceGroupName: playspot-rg
+          # which Bicep file to deploy
+          template: ./main.bicep
+          # parameters passed to the Bicep file
+          parameters: >
+            location=eastus
+            environmentName=dev
+            projectName=playspot
+          # deployment name shown in Azure portal
+          deploymentName: github-actions-deployment
+
+      # Step 4 - logout from Azure for security
+      - name: Logout from Azure
+        run: az logout
